@@ -1,0 +1,9 @@
+{
+  "name": "enter-musica",
+  "version": "2.0.0",
+  "private": true,
+  "description": "ENTER - site de música online (sem dependências externas)",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}

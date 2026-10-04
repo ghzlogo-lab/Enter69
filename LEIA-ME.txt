@@ -1,0 +1,34 @@
+ENTER — site de música ONLINE
+==============================
+
+O QUE FAZ
+- Qualquer pessoa pode ouvir 30 segundos de cada música, UMA só vez (por dispositivo).
+- Para ouvir completa ou baixar, é preciso o código que o add definiu para essa música.
+- Só o add com o nome "psique" (e a palavra-passe dele) pode adicionar músicas e eliminar as que adicionou.
+- Cada música é apagada sozinha ao fim de 7 dias.
+- O símbolo "E" e o visual são os mesmos de antes (agora também é o ícone do site).
+
+COMO PÔR ONLINE (precisa de um alojamento que corra Node.js 18+ e dê HTTPS)
+Exemplos: Render, Railway, Fly.io ou um servidor próprio (VPS).
+1. Envie esta pasta para o alojamento (ou ligue ao GitHub).
+2. Comando de arranque: npm start
+3. Defina as variáveis de ambiente:
+   ADD_PASSWORD  = palavra-passe forte do add (obrigatória, mín. 8 caracteres; use 12 ou mais)
+   DATA_DIR      = pasta de um DISCO PERSISTENTE do alojamento (ex.: /data)
+   (opcional) ADD_NAME=psique, MAX_AUDIO_MB=15, MAX_SONGS=50, SONG_TTL_HOURS=168
+4. Abra o endereço https do site, clique em "＋ Adicionar música", entre com o nome psique e a palavra-passe.
+Com Docker: docker build -t enter . && docker run -p 3000:3000 -v enter-data:/data -e ADD_PASSWORD=... enter
+
+IMPORTANTE
+- Sem disco persistente, as músicas desaparecem sempre que o alojamento reinicia (planos grátis costumam apagar o disco).
+- Use sempre HTTPS. Atrás do HTTPS do alojamento deixe TRUST_PROXY_HOPS=1 (padrão). Se o servidor ficar exposto diretamente, use TRUST_PROXY_HOPS=0.
+- Nunca partilhe a palavra-passe do add. O código de cada música é escolhido por quem a adiciona (mín. 6 caracteres) e só é guardado cifrado.
+
+SEGURANÇA (feita no servidor, não no navegador)
+- A música completa nunca é enviada sem o código certo; a prévia de 30 s é cortada no servidor ao publicar.
+- "Uma vez" é controlado por dispositivo/navegador (cookie assinado). Limpar os dados do navegador dá outra prévia de 30 s, mas nunca mais do que 30 s.
+- Códigos: guardados com scrypt, comparação em tempo constante, limite de tentativas e bloqueio temporário.
+- Login do add: limite de tentativas, sessão em cookie HttpOnly + SameSite=Strict, proteção contra pedidos forjados.
+- Ficheiros validados (MP3 verdadeiro, capa JPG/PNG/WebP), tamanho limitado, ligações de áudio temporárias e ligadas ao dispositivo.
+- Cabeçalhos de segurança (CSP, nosniff, anti-iframe, HSTS em HTTPS). Nenhuma dependência externa.
+- Quem ouve a prévia pode gravá-la (ninguém impede gravar o que sai da coluna), mas nunca obtém mais de 30 s.
